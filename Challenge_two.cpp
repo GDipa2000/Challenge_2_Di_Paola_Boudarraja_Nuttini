@@ -81,9 +81,13 @@ void extractAndReport(const MatrixXd& U, const MatrixXd& V, const VectorXd& sing
     std::cout << "For k = " << k << ":\n";
     std::cout << "Number of nonzero entries in C: " << nonZeroC << "\n";
     std::cout << "Number of nonzero entries in D: " << nonZeroD << "\n";
+    cout<<" Matrix C size: "<<C.rows()<<" x "<< C.cols()<<endl;
+    cout<<" Matrix D size: "<<D.rows()<<" x "<< D.cols()<<endl;
+    
 
     // Compute the compressed image
     MatrixXd compressedImage = C * D.transpose();
+    
 
     // Normalize the compressed image to the range [0, 255]
     compressedImage = (compressedImage.array() - compressedImage.minCoeff()) / (compressedImage.maxCoeff() - compressedImage.minCoeff()) * 255.0;
@@ -95,6 +99,7 @@ void extractAndReport(const MatrixXd& U, const MatrixXd& V, const VectorXd& sing
             compressedImg[i * compressedImage.cols() + j] = static_cast<unsigned char>(compressedImage(i, j));
         }
     }
+
 
     // Save the compressed image as a PNG file
     std::string filename = "compressed_image_k" + std::to_string(k) + ".png";
@@ -149,12 +154,17 @@ int main() {
     //Ora stampo a monitor i primi due valori singolari
     cout << "Il più grande valore singolare: " << sqrt(eigenSolver.eigenvalues().reverse()(0)) << endl;
     cout << "Il secondo più grande valore singolare: " << sqrt(eigenSolver.eigenvalues().reverse()(1)) << endl;
+    cout<<"il più grande autovalore: "<<eigenSolver.eigenvalues().reverse()(0)<<endl;
+    cout<<" il secondo autovalore più grande :"<<eigenSolver.eigenvalues().reverse()(1)<<endl; 
     
     // Esegui la decomposizione SVD
     JacobiSVD<MatrixXd> svd(imgMatrix, ComputeThinU | ComputeThinV);
     MatrixXd U = svd.matrixU();
     MatrixXd V = svd.matrixV();
     VectorXd singularValues = svd.singularValues();
+    //perform a singular value decomposition of the matrix corresponding to the noisy image. Report the two largest computed singular values.
+    cout << "Il più grande valore singolare: " << singularValues(0) << endl;
+    cout << "Il secondo più grande valore singolare: " << singularValues(1) << endl;
 
     // Calcola la norma euclidea dei valori singolari
     double norm = singularValues.norm();
@@ -200,6 +210,11 @@ int main() {
     MatrixXd U_noisy_checkerboardMatrix = svd_noisy_checkerboardMatrix.matrixU();
     MatrixXd V_noisy_checkerboardMatrix = svd_noisy_checkerboardMatrix.matrixV();
     VectorXd singularValues_noisy_checkerboardMatrix = svd_noisy_checkerboardMatrix.singularValues();
+    // Report the two largest computed singular values
+    std::cout << "The largest singular value: " << singularValues_noisy_checkerboardMatrix(0) << "\n";
+    std::cout << "The second largest singular value: " << singularValues_noisy_checkerboardMatrix(1) << "\n";
+
+
     // Estrai e riporta per k = 5 e k = 10
     extractAndReport(U_noisy_checkerboardMatrix, V_noisy_checkerboardMatrix, singularValues_noisy_checkerboardMatrix, 5);
     extractAndReport(U_noisy_checkerboardMatrix, V_noisy_checkerboardMatrix, singularValues_noisy_checkerboardMatrix, 10);
